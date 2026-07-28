@@ -1,0 +1,12 @@
+.git
+.github
+frontend
+assets
+node_modules
+**/target
+**/.idea
+**/.vscode
+*.md
+LICENSE
+docker-compose.yml
+vercel.json
