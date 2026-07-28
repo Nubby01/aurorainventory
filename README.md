@@ -245,6 +245,60 @@ npm run preview
 
 ---
 
+## ☁ Despliegue (Railway + Vercel)
+
+El frontend vive en **Vercel**. La API Spring Boot + MySQL viven en **Railway**.
+
+### 1. Railway — MySQL
+
+1. Entra a [railway.app](https://railway.app) y crea un proyecto.
+2. **New → Database → MySQL**.
+3. Anota las variables que genera Railway (`MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`).
+
+### 2. Railway — API Spring Boot
+
+1. **New → GitHub Repo** → selecciona `Nubby01/aurorainventory`.
+2. En el servicio, configura:
+   - **Root Directory:** `backend`
+   - Builder: Dockerfile (detecta `backend/Dockerfile`)
+3. Variables de entorno del servicio API:
+
+| Variable | Valor |
+|----------|--------|
+| `SPRING_PROFILES_ACTIVE` | `mysql` |
+| `APP_CORS_ALLOWED_ORIGINS` | `https://aurorainventory.vercel.app,http://localhost:5173` |
+| `MYSQLHOST` | referencia a la variable del servicio MySQL |
+| `MYSQLPORT` | referencia a la variable del servicio MySQL |
+| `MYSQLDATABASE` | referencia a la variable del servicio MySQL |
+| `MYSQLUSER` | referencia a la variable del servicio MySQL |
+| `MYSQLPASSWORD` | referencia a la variable del servicio MySQL |
+
+En Railway puedes usar **Variable Reference** desde el servicio MySQL en lugar de copiar valores a mano.
+
+4. **Settings → Networking → Generate Domain** para obtener la URL pública (ej. `https://aurora-inventory-xxx.up.railway.app`).
+5. Prueba en el navegador:
+
+```text
+https://TU-API.up.railway.app/api/reports/summary
+```
+
+Debe devolver JSON.
+
+### 3. Vercel — conectar el frontend
+
+1. Proyecto **aurorainventory** → **Settings → Environment Variables**.
+2. Crea:
+
+| Name | Value | Environments |
+|------|--------|--------------|
+| `VITE_API_URL` | `https://TU-API.up.railway.app/api` | Production, Preview |
+
+3. **Deployments → Redeploy** (obligatorio: Vite embebe la variable en el build).
+
+4. Abre [https://aurorainventory.vercel.app](https://aurorainventory.vercel.app): el resumen debe cargar datos (ya no “Sin conexión al API”).
+
+---
+
 ## 📅 Roadmap
 
 - [x] CRUD de productos.
@@ -254,10 +308,10 @@ npm run preview
 - [x] Reportes y panel resumen.
 - [x] Diseño responsive e identidad Aurora Coffee.
 - [x] Integración con MySQL.
+- [x] Despliegue frontend (Vercel) + API (Railway).
 - [ ] Autenticación de administradores.
 - [ ] Roles (admin / bodega / gerente).
 - [ ] Exportación de reportes (CSV / PDF).
-- [ ] Despliegue en la nube (API + frontend).
 
 ---
 
