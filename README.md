@@ -37,6 +37,7 @@ Crear un sistema de inventario que permita:
 - Reportes por categoría y prioridad de reposición.
 - Datos semilla alineados al menú de Aurora Coffee (precios en CLP).
 - Persistencia real con MySQL (y perfil H2 para desarrollo rápido).
+- Frontend desplegado en Vercel y API en Railway.
 - Identidad visual compartida (Fraunces, Zen Maru Gothic, Manrope).
 - Enlaces a Aurora Coffee, Booking y Dashboard.
 - Footer con crédito de autora.
@@ -56,6 +57,9 @@ Crear un sistema de inventario que permita:
 - MySQL 8.
 - H2 (perfil de desarrollo).
 - Docker Compose (opcional para MySQL).
+- Docker (despliegue de la API).
+- Railway (API + MySQL).
+- Vercel (frontend).
 - Google Fonts: Fraunces, Zen Maru Gothic y Manrope.
 - Maven Wrapper.
 
@@ -74,6 +78,7 @@ aurorainventory/
 │   ├── captura-alertas.png
 │   └── captura-reportes.png
 ├── backend/
+│   ├── Dockerfile
 │   ├── src/main/java/com/aurora/inventory/
 │   │   ├── config/
 │   │   ├── controller/
@@ -121,6 +126,9 @@ aurorainventory/
 │   ├── package.json
 │   └── vite.config.js
 ├── docker-compose.yml
+├── Dockerfile
+├── railway.toml
+├── vercel.json
 ├── LICENSE
 └── README.md
 ```
@@ -157,6 +165,8 @@ aurorainventory/
 
 ## 🚀 Demo
 
+- [Ver aplicación](https://aurorainventory.vercel.app/)
+- [Ver API](https://aurorainventory-production.up.railway.app/api/health)
 - [Ver repositorio](https://github.com/Nubby01/aurorainventory)
 - [Sitio de Aurora Coffee](https://aurora-coffee-bay.vercel.app/)
 - [Sistema de reservas (Aurora Booking)](https://aurora-booking-rho.vercel.app/)
@@ -247,55 +257,40 @@ npm run preview
 
 ## ☁ Despliegue (Railway + Vercel)
 
-El frontend vive en **Vercel**. La API Spring Boot + MySQL viven en **Railway**.
+El frontend está en **Vercel** y la API + MySQL en **Railway**.
 
-### 1. Railway — MySQL
+| Servicio | URL |
+|----------|-----|
+| Frontend | https://aurorainventory.vercel.app/ |
+| API | https://aurorainventory-production.up.railway.app/ |
+| Health | https://aurorainventory-production.up.railway.app/api/health |
 
-1. Entra a [railway.app](https://railway.app) y crea un proyecto.
-2. **New → Database → MySQL**.
-3. Anota las variables que genera Railway (`MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`).
+En producción, el frontend usa por defecto la API de Railway (`frontend/src/utils/constants.js`). Opcionalmente puedes definir `VITE_API_URL` en Vercel.
 
-### 2. Railway — API Spring Boot
+### Railway (API + MySQL)
 
-1. **New → GitHub Repo** → selecciona `Nubby01/aurorainventory`.
-2. En el servicio, configura:
-   - **Root Directory:** `backend`
-   - Builder: Dockerfile (detecta `backend/Dockerfile`)
-3. Variables de entorno del servicio API:
+1. Crea un proyecto en [railway.app](https://railway.app) y añade **MySQL**.
+2. Despliega el repo `Nubby01/aurorainventory` (Root Directory vacío; usa el `Dockerfile` de la raíz).
+3. Variables del servicio API:
 
 | Variable | Valor |
 |----------|--------|
 | `SPRING_PROFILES_ACTIVE` | `mysql` |
 | `APP_CORS_ALLOWED_ORIGINS` | `https://aurorainventory.vercel.app,http://localhost:5173` |
-| `MYSQLHOST` | referencia a la variable del servicio MySQL |
-| `MYSQLPORT` | referencia a la variable del servicio MySQL |
-| `MYSQLDATABASE` | referencia a la variable del servicio MySQL |
-| `MYSQLUSER` | referencia a la variable del servicio MySQL |
-| `MYSQLPASSWORD` | referencia a la variable del servicio MySQL |
+| `MYSQLHOST` | valor del servicio MySQL (ej. `mysql.railway.internal`) |
+| `MYSQLPORT` | valor del servicio MySQL |
+| `MYSQLDATABASE` | valor del servicio MySQL |
+| `MYSQLUSER` | valor del servicio MySQL |
+| `MYSQLPASSWORD` | valor del servicio MySQL |
 
-En Railway puedes usar **Variable Reference** desde el servicio MySQL en lugar de copiar valores a mano.
+4. **Settings → Networking → Generate Domain**.
+5. Prueba: `https://TU-API.up.railway.app/api/reports/summary`
 
-4. **Settings → Networking → Generate Domain** para obtener la URL pública (ej. `https://aurora-inventory-xxx.up.railway.app`).
-5. Prueba en el navegador:
+### Vercel (frontend)
 
-```text
-https://TU-API.up.railway.app/api/reports/summary
-```
-
-Debe devolver JSON.
-
-### 3. Vercel — conectar el frontend
-
-1. Proyecto **aurorainventory** → **Settings → Environment Variables**.
-2. Crea:
-
-| Name | Value | Environments |
-|------|--------|--------------|
-| `VITE_API_URL` | `https://TU-API.up.railway.app/api` | Production, Preview |
-
-3. **Deployments → Redeploy** (obligatorio: Vite embebe la variable en el build).
-
-4. Abre [https://aurorainventory.vercel.app](https://aurorainventory.vercel.app): el resumen debe cargar datos (ya no “Sin conexión al API”).
+1. Importa el repo y despliega (Root Directory vacío o `frontend` según tu configuración).
+2. Opcional: variable `VITE_API_URL` = `https://aurorainventory-production.up.railway.app/api`
+3. Redeploy si cambias variables de entorno.
 
 ---
 
