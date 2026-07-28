@@ -11,7 +11,12 @@ export const COFFEE_URL = 'https://aurora-coffee-bay.vercel.app/';
 export const BOOKING_URL = 'https://aurora-booking-rho.vercel.app/';
 export const DASHBOARD_URL = 'https://aurora-dashboard-tawny.vercel.app/';
 
-export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const LOCAL_API = 'http://localhost:8080/api';
+const RAILWAY_API = 'https://aurorainventory-production.up.railway.app/api';
+
+export const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? RAILWAY_API : LOCAL_API);
 
 export const MOVEMENT_LABELS = {
   IN: 'Entrada',

@@ -40,7 +40,7 @@ export default function DashboardPage({ onNavigate }) {
         <PageHeader
           eyebrow="接続"
           title="Sin conexión al API"
-          lead={`No se pudo contactar el backend: ${error}. Asegúrate de iniciar Spring Boot en el puerto 8080.`}
+          lead={`No se pudo contactar el backend: ${error}. Revisa que la API en Railway esté online y que CORS permita este dominio.`}
         />
       </div>
     );
